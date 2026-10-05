@@ -9,7 +9,7 @@ nav_order: 14
 
 La propuesta utiliza una arquitectura distribuida en la que cada dispositivo realiza únicamente la función para la que resulta más adecuado.
 
-El **Meta Quest 3** funciona como interfaz de realidad mixta; la **PC de borde** realiza la planeación, visión e inteligencia artificial; el **UR3** ejecuta únicamente trayectorias previamente validadas; y la **Raspberry Pi** administra el inventario local y la comunicación con la nube.
+El **Meta Quest 3** funciona como interfaz de realidad mixta; la **PC de borde** realiza la planeación, visión de la cámara RGB-D y ejecución de scripts en Python; el **UR3** ejecuta únicamente trayectorias previamente validadas; y la **Raspberry Pi** administra un modelo de visión de la cámara RGB.
 
 La información física del almacén se relaciona con una representación tridimensional parametrizada, permitiendo seleccionar virtualmente un producto, analizar la trayectoria del robot, corregir posibles singularidades y posteriormente ejecutar el movimiento sobre el robot real.
 
