@@ -19,6 +19,7 @@ Documentación del proyecto final: selección de hardware, arquitectura, protoco
 ## Sobre este proyecto
 
 Este sitio documenta el desarrollo de un sistema donde un operador utiliza lentes de realidad mixta (Meta Quest 3) para manipular el gemelo digital de un robot UR3, de modo que, a partir de herramientas integradas VR, el operador entrara en un entorno de realidad mixta donde podrá interactuar con un almacén, de forma que a partir de la interacción con sus manos podrá elegir el producto que desea tomar, siendo esta la acción que vincula al robot a ejecutarte y tomar la pieza seleccionada. 
+{: style="text-align: justify;" }
 
 ## Autores
 
