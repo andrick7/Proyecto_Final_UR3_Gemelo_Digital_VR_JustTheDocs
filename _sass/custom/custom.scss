@@ -1,0 +1,20 @@
+// Ajustes finos que el esquema de color no cubre:
+// el logo, la categoría del menú y los íconos necesitan texto blanco
+// porque quedan sobre el fondo rojo del sidebar.
+
+.site-title {
+  color: #ffffff !important;
+}
+
+.nav-category {
+  color: #ffffff;
+  border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.nav-list-expander {
+  color: #ffffff;
+}
+
+.search-label .search-icon {
+  color: #ffffff;
+}
