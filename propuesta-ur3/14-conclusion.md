@@ -14,4 +14,3 @@ El **Meta Quest 3** funciona como interfaz de realidad mixta; la **PC de borde**
 La información física del almacén se relaciona con una representación tridimensional parametrizada, permitiendo seleccionar virtualmente un producto, analizar la trayectoria del robot, corregir posibles singularidades y posteriormente ejecutar el movimiento sobre el robot real.
 
 Finalmente, el sistema de inventario mantiene sincronizados el almacén físico, el gemelo digital, la base de datos y la aplicación móvil, permitiendo conocer de manera remota qué productos existen, cuántos quedan y qué movimientos se han realizado.
-{: style="text-align: justify;" }
