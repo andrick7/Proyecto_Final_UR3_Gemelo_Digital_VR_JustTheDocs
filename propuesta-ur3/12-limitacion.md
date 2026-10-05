@@ -9,7 +9,7 @@ nav_order: 12
 
 El UR3 tiene aproximadamente **500 mm de alcance** y una carga útil nominal de aproximadamente **3 kg**.
 
-Por esta razón, la cuadrícula $$10\times10\times10$$ debe entenderse principalmente como el modelo lógico del almacén.
+Por esta razón, la cuadrícula $$4\times3\times1$$ debe entenderse principalmente como el modelo lógico del almacén.
 
 El prototipo físico deberá utilizar inicialmente una sección reducida del almacén ubicada dentro del espacio de trabajo del UR3.
 
