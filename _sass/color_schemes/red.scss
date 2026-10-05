@@ -1,0 +1,20 @@
+// Esquema de color personalizado "red" para Just the Docs
+// Basado en las variables que el tema permite sobrescribir.
+
+$body-background-color: #ffffff;
+$body-text-color: #27282b;
+$body-heading-color: #b91c1c;       // rojo oscuro para encabezados
+$link-color: #dc2626;               // rojo para enlaces
+$nav-child-link-color: #27282b;
+
+$base-button-color: #fdf2f2;
+$btn-primary-color: #dc2626;        // botones principales en rojo
+
+$border-color: #f3c6c6;
+$table-border-color: #f3c6c6;
+
+$search-background-color: #ffffff;
+$search-result-preview-color: #6b7280;
+
+$code-background-color: #fdf2f2;
+$feedback-color: darken($sidebar-color, 3%);
