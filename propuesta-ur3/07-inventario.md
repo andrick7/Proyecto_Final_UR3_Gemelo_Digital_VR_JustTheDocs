@@ -7,22 +7,16 @@ nav_order: 7
 
 # Control del inventario
 
-Para mantener actualizado el inventario se propone colocar **celdas de carga** en las diferentes posiciones o contenedores del almacén.
+Para mantener actualizado el inventario se propone colocar **camara RGB** en una posición que permita observar todo el almacén.
 
-Si una celda contiene un único tipo de producto y el peso individual es $$m_u$$, mientras que el peso total detectado es $$m_t$$, se puede estimar la cantidad mediante:
+Si una celda contiene o no un producto, se podrá observar en los visores VR, en la base de datos y en la aplicación móvil; de forma que en todo momento se tendrá actualización del estado del inventario. 
 
-$$
-N \approx \frac{m_t}{m_u}
-$$
-
-El ESP32 realiza la adquisición de los sensores y envía los valores por MQTT hacia una Raspberry Pi.
-
-La Raspberry Pi mantiene una base de datos local con información como:
+La Raspberry Pi mantiene un control del tipo de producto con información como:
 
 - ID del producto.
 - Ubicación $$(i,j,k)$$.
 - Cantidad.
-- Peso esperado.
+- Tipo de prodcuto.
 - Último movimiento.
 - Fecha y hora.
 - Estado de la posición.
@@ -33,9 +27,9 @@ $$
 N_{\text{nuevo}} = N_{\text{anterior}} - 1
 $$
 
-y posteriormente el valor se compara contra la lectura real de la celda de carga.
+y posteriormente el valor se compara contra la lectura real que detecta la cámara RGB.
 
 Esto permite tener dos fuentes de información:
 
 1. El movimiento registrado por el robot.
-2. El inventario físico obtenido mediante sensores.
+2. El inventario físico obtenido mediante la captura de la cámara.
