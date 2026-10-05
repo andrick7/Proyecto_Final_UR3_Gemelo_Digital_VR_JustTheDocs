@@ -17,7 +17,7 @@ nav_order: 10
 | Inventario | Sensor infrarrojo por celda | Detecta presencia, pero no determina correctamente la cantidad cuando existen varios productos en la misma posición. |
 | Inventario | Ultrasonido | La lectura depende de la geometría y posición del producto y puede presentar reflexiones. |
 | Inventario | RFID en todos los productos | Permitiría identificar individualmente cada pieza, pero aumenta costo y requiere colocar una etiqueta en cada producto. Se considera como mejora futura. |
-| Base de datos | Solamente nube | Si se pierde Internet, el sistema perdería acceso al estado operativo. Por ello se mantiene una base local y posteriormente se sincroniza. |
+| Base de datos | Solamente de forma local | Optamos por una base en tiempo real, el sistema no perdería acceso al estado operativo. Por ello se mantiene una base en tiempo real y en la nube, para posteriormente sincronizarla con la aplicación móvil y nuestro visor (Meta Quest 3). |
 | Realidad mixta | Meta Quest 3S | Aunque también permite MR, se prefiere Quest 3 por su mejor sistema óptico y sensor de profundidad. |
 | Singularidades | IA como único método | Una IA puede proponer correcciones, pero no debe reemplazar la evaluación matemática del Jacobiano, límites y colisiones. |
 
