@@ -11,16 +11,16 @@ El objetivo del proyecto es desarrollar un sistema en el que un **robot colabora
 
 El operador utilizará unos lentes de realidad mixta para observar una representación digital del robot y de un almacén previamente parametrizado.
 
-El almacén será representado mediante una cuadrícula tridimensional. Por ejemplo, una estructura de:
+El almacén será representado mediante una cuadrícula bidimensional. Por ejemplo, una estructura de:
 
 $$
-10 \times 10 \times 10
+4 \times 3
 $$
 
 permitiría representar hasta:
 
 $$
-10 \cdot 10 \cdot 10 = 1000
+4 \cdot 3 = 12
 $$
 
 posiciones lógicas diferentes.
@@ -35,6 +35,4 @@ donde $$i$$, $$j$$ y $$k$$ representan la posición del producto dentro del alma
 
 El usuario podrá seleccionar dentro de los lentes una celda o producto. El sistema calculará primero una trayectoria para el gemelo digital del UR3 y comprobará que el movimiento sea válido.
 
-Si la trayectoria no presenta colisiones, límites articulares o singularidades, el usuario podrá presionar un botón de **Ejecutar** dentro de la interfaz de realidad mixta.
-
-Solamente después de una segunda validación, la trayectoria será enviada al robot UR3 físico.
+Si la trayectoria no presenta colisiones, límites articulares o singularidades, el usuario podrá presionar un botón de **Ejecutar** dentro de la interfaz de realidad mixta, misma que será enviada al robot UR3 físico.
