@@ -13,3 +13,4 @@ La arquitectura se divide en cuatro partes principales:
 2. **Computadora de borde:** encargada de Simulink, planeación de trayectorias y procesamiento de imágenes.
 3. **Sistema físico:** robot UR3, gripper y cámara RGB-D colocada cerca del efector final.
 4. **Sistema de inventario:** Raspberry Pi, base de datos en tiempo real (FireBase) y aplicación móvil.
+{: style="text-align: justify;" }
