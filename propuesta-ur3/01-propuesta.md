@@ -14,13 +14,13 @@ El operador utilizará unos lentes de realidad mixta para observar una represent
 El almacén será representado mediante una cuadrícula bidimensional. Por ejemplo, una estructura de:
 
 $$
-4 \times 3
+4 \times 3 \times 1
 $$
 
 permitiría representar hasta:
 
 $$
-4 \cdot 3 = 12
+4 \cdot 3 \cdot 1= 12
 $$
 
 posiciones lógicas diferentes.
