@@ -1,5 +1,5 @@
 ---
-layout: home
+layout: Inicio
 title: Inicio
 nav_order: 1
 description: "Documentación del proyecto: Control de un UR3 mediante gemelo digital y realidad mixta"
