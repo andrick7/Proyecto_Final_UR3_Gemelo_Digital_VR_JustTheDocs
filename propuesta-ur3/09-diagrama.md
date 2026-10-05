@@ -24,6 +24,7 @@ Imagen de la arquitectura del sistema.
 7. Validación final con estado actual del UR3 físico
 8. UR3 ejecuta la trayectoria
 9. Cámara RGB-D + YOLO verifica el producto
-10. Se actualiza el inventario en base de datos (FireBase), App Móvil y visor. 
-11. Raspberry Pi sincroniza la información con la nube
-12. **Fin / ciclo continuo**
+10. Cámara RGB + Modelo verifica cantidad de productos en almacén. 
+11. Se actualiza el inventario en base de datos (FireBase), App Móvil y visor. 
+12. Raspberry Pi sincroniza la información con la nube
+13. **Fin / ciclo continuo**
