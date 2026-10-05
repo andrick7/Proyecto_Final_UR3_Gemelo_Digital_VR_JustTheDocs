@@ -1,20 +1,77 @@
-// Ajustes finos que el esquema de color no cubre:
-// el logo, la categoría del menú y los íconos necesitan texto blanco
-// porque quedan sobre el fondo rojo del sidebar.
+// =========================================================
+// Ajustes finos que el archivo de esquema de color (red.scss)
+// NO puede resolver, porque algunos elementos del tema comparten
+// la misma variable que otros elementos con un fondo distinto.
+//
+// Ejemplo del problema: $body-heading-color pinta tanto los
+// títulos del contenido (fondo hueso → debe ser negro) COMO el
+// logo del sidebar (fondo rojo → necesita ser blanco). Como es
+// la MISMA variable, no se pueden poner dos colores distintos
+// solo con red.scss. Por eso aquí forzamos el color exacto de
+// cada elemento puntual, directamente por su nombre de clase CSS.
+// =========================================================
 
 .site-title {
-  color: #695D5D !important;
+  color: #ffffff !important;
+  // El logo/título de arriba a la izquierda ("Just the Docs Template").
+  // Por defecto toma el color de $body-heading-color (negro), que sería
+  // invisible sobre el fondo rojo del sidebar. Lo forzamos a blanco.
+  // El !important asegura que esta regla gane sobre la del tema.
 }
 
 .nav-category {
-  color: #000000; // Color titulo superior izquierdo 
+  color: #ffffff;
+  // El encabezado de categoría en el menú (el texto en mayúsculas,
+  // ej. "PROPUESTA DEL PROYECTO"). Blanco por la misma razón: sin
+  // esto, por defecto sería un color oscuro ilegible sobre el rojo.
+
   border-bottom-color: rgba(255, 255, 255, 0.3);
+  // La línea delgada que aparece debajo de esa categoría.
+  // La hacemos blanca semitransparente (30% de opacidad) para que
+  // se note como una división sutil, no una línea blanca sólida y dura.
 }
 
 .nav-list-expander {
-  color: #ffffff;
+  color: #ffffff !important;
+  // El ícono de flecha (▸ / ▾) que expande o colapsa las subpáginas
+  // de "Propuesta del Proyecto" en el menú. Blanco para que se vea
+  // sobre el fondo oscuro del sidebar.
 }
 
 .search-label .search-icon {
   color: #ffffff;
+  // El ícono de lupa 🔍 de la caja de búsqueda, que vive dentro del
+  // sidebar. Blanco por la misma razón que los anteriores.
+}
+
+// -----------------------------------------------------------------
+// "Propuesta del Proyecto" (el título padre) se veía invisible porque,
+// al estar dentro de una de sus subpáginas, el tema lo marca como
+// "activo" y le aplica un color de texto distinto (el mismo rojo de
+// los enlaces, $link-color) en vez de blanco. Si ese color de acento
+// es parecido al fondo del sidebar, el texto prácticamente desaparece.
+// Forzamos aquí ese estado "activo"/"hover" a blanco también.
+// -----------------------------------------------------------------
+
+.nav-list-link,
+.nav-list-link:visited {
+  color: #ffffff;
+  // Color de texto por defecto de CUALQUIER link del menú (padre o hijo).
+}
+
+.nav-list-link:hover,
+.nav-list-link.active,
+.nav-list-item.active > .nav-list-link {
+  color: #ffffff !important;
+  // Color de texto cuando el link está activo (la página que estás viendo,
+  // o su "padre") o cuando pasas el mouse encima. Sin esto, el tema usa
+  // el color de acento ($link-color), que puede volverse invisible si
+  // es parecido al color del sidebar.
+}
+
+.nav-list-item.active > .nav-list-link > .nav-list-expander,
+.nav-list-link:hover .nav-list-expander {
+  color: #ffffff !important;
+  // Igual que arriba, pero para el ícono de flecha cuando el elemento
+  // está activo o en hover.
 }
