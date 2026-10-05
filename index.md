@@ -12,7 +12,7 @@ permalink: /
 Documentación del proyecto final: selección de hardware, arquitectura, protocolos de comunicación y toma de decisiones para controlar un robot colaborativo UR3 a partir de su gemelo digital en realidad mixta.
 {: .fs-6 .fw-300 }
 
-[Ver la propuesta completa](/propuesta-ur3.html){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+[Ver la propuesta completa]({{ '/propuesta-ur3.html' | relative_url }}){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
 
 ---
 
