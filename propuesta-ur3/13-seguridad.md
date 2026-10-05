@@ -23,5 +23,4 @@ Antes de ejecutar físicamente se debe verificar:
 
 Por lo tanto, se utiliza el principio:
 
-{: .important }
 > **Seleccionar → Planear → Simular → Validar → Ejecutar**
