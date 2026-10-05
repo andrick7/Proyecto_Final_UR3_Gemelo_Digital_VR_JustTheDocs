@@ -20,4 +20,8 @@ Documentación del proyecto final: selección de hardware, arquitectura, protoco
 
 Este sitio documenta el desarrollo de un sistema donde un operador utiliza lentes de realidad mixta (Meta Quest 3) para manipular el gemelo digital de un robot UR3, validar trayectorias y ejecutarlas sobre el robot físico — todo integrado con un sistema de inventario inteligente.
 
-Autor: Andrick Millan
+## Autores
+
+- Andrick Millan
+- Diego Esqueda
+- Calixto
