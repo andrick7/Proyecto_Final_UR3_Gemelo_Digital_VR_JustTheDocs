@@ -2,7 +2,7 @@
 title: Práctica 2
 layout: default
 parent: Prácticas
-nav_order: 1
+nav_order: 2
 ---
 
 # Práctica 2
