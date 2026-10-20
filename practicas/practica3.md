@@ -6,144 +6,165 @@ parent: Prácticas
 nav_order: 3
 ---
 
-# Práctica 3: Comunicación UART con ESP32
+# Práctica 3. Comunicación UART con ESP32
 
 ## 1. Introducción
 
-La comunicación serial es un mecanismo ampliamente utilizado para intercambiar información entre microcontroladores y computadoras. Uno de los protocolos más comunes para este propósito es UART (*Universal Asynchronous Receiver-Transmitter*), que permite transmitir datos mediante líneas de transmisión y recepción sin necesidad de una señal de reloj compartida.
+La comunicación serial es un mecanismo ampliamente utilizado para intercambiar información entre microcontroladores y computadoras. Uno de los protocolos más comunes es UART (*Universal Asynchronous Receiver-Transmitter*), que permite transmitir datos mediante líneas de transmisión y recepción sin requerir una señal de reloj compartida.
 
-En esta práctica se evaluó la comunicación UART entre una tarjeta ESP32 y una computadora, utilizando un puente USB-UART CP210x. Se implementó un programa en el ESP32 para recibir mensajes enviados desde la computadora y devolverlos como respuesta. Posteriormente, se desarrolló una prueba en Python para enviar múltiples mensajes, verificar su integridad y medir el tiempo de ida y vuelta (*Round-Trip Time*, RTT).
+En esta práctica se implementó una comunicación UART entre un ESP32 y una computadora mediante una interfaz USB-UART. Se desarrolló un programa en el microcontrolador para recibir mensajes y devolverlos al emisor, así como un programa en Python para automatizar las pruebas.
 
-Se realizaron pruebas con diferentes velocidades de transmisión para observar su efecto sobre la integridad de los mensajes y el comportamiento de la comunicación serial.
+Se busca evaluar la integridad de los mensajes, analizar el tiempo de ida y vuelta y observar el comportamiento de la comunicación al modificar la velocidad de transmisión.
 
 ## 2. Objetivos
 
 ### 2.1 Objetivo general
 
-Evaluar el funcionamiento de la comunicación UART entre un ESP32 y una computadora, analizando la integridad de los mensajes y el tiempo de respuesta para distintas velocidades de transmisión.
+Implementar y evaluar una comunicación UART entre un ESP32 y una computadora, utilizando Python para automatizar el envío y la recepción de mensajes.
 
 ### 2.2 Objetivos específicos
 
-- Implementar un sistema de recepción y transmisión de mensajes UART en el ESP32.
-- Establecer una comunicación serial entre la computadora y el microcontrolador.
-- Automatizar el envío de mensajes mediante Python.
-- Verificar que los mensajes recibidos coincidan con los mensajes enviados.
-- Medir el tiempo de ida y vuelta de los mensajes.
-- Comparar los resultados obtenidos con diferentes velocidades de transmisión.
+- Identificar el funcionamiento básico de la comunicación UART.
+- Configurar diferentes velocidades de transmisión.
+- Implementar un programa de eco en el ESP32.
+- Automatizar el envío y la verificación de mensajes mediante Python.
+- Calcular el porcentaje de mensajes correctos y errores.
+- Medir el tiempo de ida y vuelta (*Round-Trip Time*, RTT).
+- Registrar los resultados para generar tablas y gráficas comparativas.
 
-## 3. Fundamentos teóricos
+## 3. Marco teórico
 
-### 3.1 Protocolo UART
+### 3.1 Comunicación UART
 
-UART es un protocolo de comunicación serial asíncrona que transmite los datos de manera secuencial. A diferencia de los protocolos síncronos, no necesita una línea de reloj compartida entre el transmisor y el receptor.
+UART es un protocolo de comunicación serial asíncrona. Los dispositivos intercambian información utilizando principalmente dos señales:
 
-Una trama UART normalmente contiene:
+- **TX:** línea por la que se transmiten los datos.
+- **RX:** línea por la que se reciben los datos.
 
-- **Bit de inicio:** indica el comienzo de la transmisión.
-- **Bits de datos:** contienen la información transmitida.
-- **Bit de paridad:** opcional, empleado para detectar ciertos errores.
-- **Bit de parada:** indica el final de la trama.
+Para establecer una comunicación correcta, ambos dispositivos deben utilizar parámetros compatibles, como la velocidad de transmisión, el número de bits de datos, la paridad y los bits de parada.
 
-En esta práctica se utilizó una configuración de 8N1, que corresponde a ocho bits de datos, sin paridad y un bit de parada. Por lo tanto, cada byte requiere diez bits transmitidos, considerando el bit de inicio.
+Una configuración habitual es **8N1**, que significa:
+
+- 8 bits de datos.
+- N: sin bit de paridad.
+- 1 bit de parada.
+
+En esta configuración, cada byte requiere 10 bits transmitidos, considerando un bit de inicio, ocho bits de datos y un bit de parada.
 
 ### 3.2 Velocidad de transmisión
 
-La velocidad de transmisión se expresa en baudios. En una comunicación UART convencional, cada símbolo representa un bit, por lo que la velocidad en baudios coincide numéricamente con la tasa de bits.
+La velocidad de transmisión se expresa comúnmente en baudios. En una conexión UART convencional, donde cada símbolo representa un bit, el valor numérico de los baudios coincide con la tasa de bits por segundo.
 
-La configuración del transmisor y del receptor debe coincidir. Una diferencia entre las velocidades configuradas puede provocar que los datos se interpreten incorrectamente.
+Para una configuración 8N1, la tasa teórica de transmisión de bytes se calcula mediante:
 
-Para una comunicación UART configurada en 8N1, la tasa teórica máxima de transmisión de bytes, sin considerar pausas ni sobrecargas adicionales, puede aproximarse mediante:
-
-\[
+$$
 R_{\text{bytes}} = \frac{B}{10}
-\]
+$$
 
 donde:
 
-- \(R_{\text{bytes}}\) es la tasa teórica de bytes por segundo.
-- \(B\) es la velocidad de transmisión en baudios.
+- $R_{\text{bytes}}$ es la tasa teórica de transmisión, en bytes por segundo.
+- $B$ es la velocidad de transmisión, en bits por segundo.
 
-Por ejemplo, a 115200 baudios:
+Por ejemplo, para una velocidad de transmisión de $115200$ baudios:
 
-\[
+$$
 R_{\text{bytes}} = \frac{115200}{10}
-= 11520\ \text{bytes/s}
-\]
+$$
 
-Este valor es teórico y no representa necesariamente el rendimiento efectivo de una aplicación que utiliza USB, un sistema operativo y procesamiento adicional.
+$$
+R_{\text{bytes}} = 11520\ \text{bytes/s}
+$$
 
-### 3.3 Tiempo de ida y vuelta (RTT)
+Este valor representa una tasa teórica para la transmisión continua de datos. El rendimiento real puede ser menor debido a los tiempos de procesamiento, las pausas entre mensajes, la interfaz USB-UART y el sistema operativo.
 
-El tiempo de ida y vuelta o RTT es el intervalo entre el envío de un mensaje y la recepción de su respuesta.
+### 3.3 Integridad de los mensajes
 
-En esta práctica, la medición incluye:
-
-- El envío de datos desde Python.
-- La transmisión por USB-UART.
-- La recepción y el procesamiento en el ESP32.
-- La transmisión de la respuesta.
-- La recepción y el procesamiento en la computadora.
-
-Por esta razón, el RTT medido no corresponde exclusivamente a la latencia del protocolo UART ni a la latencia en un solo sentido.
-
-### 3.4 Integridad de los mensajes
-
-Para evaluar la integridad de la comunicación, se comparó cada mensaje recibido con el mensaje que se había enviado.
+La integridad de la comunicación se evalúa comparando cada mensaje recibido con el mensaje que se había enviado.
 
 La tasa de mensajes correctos se calcula mediante:
 
-\[
+$$
 P_{\text{correctos}} =
 \frac{N_{\text{correctos}}}{N_{\text{enviados}}}
 \times 100
-\]
+$$
 
 El porcentaje de errores se calcula como:
 
-\[
+$$
 P_{\text{errores}} =
 \frac{N_{\text{errores}}}{N_{\text{enviados}}}
 \times 100
-\]
+$$
 
-donde \(N_{\text{correctos}}\) representa el número de mensajes recibidos correctamente, \(N_{\text{errores}}\) el número de mensajes incorrectos o no recibidos y \(N_{\text{enviados}}\) el total de mensajes enviados.
+El número total de errores se determina mediante:
+
+$$
+N_{\text{errores}} =
+N_{\text{enviados}} - N_{\text{correctos}}
+$$
+
+donde:
+
+- $N_{\text{enviados}}$ es el número total de mensajes transmitidos.
+- $N_{\text{correctos}}$ es el número de respuestas que coinciden exactamente con los mensajes enviados.
+- $N_{\text{errores}}$ es el número de mensajes incorrectos o sin respuesta.
+- $P_{\text{correctos}}$ es el porcentaje de mensajes correctos.
+- $P_{\text{errores}}$ es el porcentaje de errores.
+
+Si todos los mensajes se clasifican como correctos o erróneos, se cumple que:
+
+$$
+P_{\text{correctos}} + P_{\text{errores}} = 100\%
+$$
+
+### 3.4 Tiempo de ida y vuelta (RTT)
+
+El tiempo de ida y vuelta (*Round-Trip Time*, RTT) representa el intervalo entre el inicio del envío de un mensaje y la recepción completa de su respuesta.
+
+Para el mensaje $i$, el RTT se calcula mediante:
+
+$$
+RTT_i = t_{\text{final},i} - t_{\text{inicial},i}
+$$
+
+donde:
+
+- $t_{\text{inicial},i}$ es el instante en que comienza el envío del mensaje.
+- $t_{\text{final},i}$ es el instante en que se recibe la respuesta completa.
+- $RTT_i$ es el tiempo de ida y vuelta del mensaje, expresado en milisegundos si los instantes se convierten a esa unidad.
+
+El RTT promedio se calcula mediante:
+
+$$
+RTT_{\text{promedio}} =
+\frac{1}{N_{\text{RTT}}}
+\sum_{i=1}^{N_{\text{RTT}}} RTT_i
+$$
+
+donde $N_{\text{RTT}}$ es el número de respuestas válidas consideradas para el cálculo.
+
+El RTT incluye el tiempo de transmisión de ida y vuelta, el procesamiento en el ESP32, los retardos de la interfaz USB-UART y los tiempos asociados al sistema operativo. Por tanto, no representa exclusivamente el tiempo de procesamiento del microcontrolador ni la latencia unidireccional.
 
 ## 4. Materiales y herramientas
 
-- Tarjeta de desarrollo ESP32.
-- Computadora con sistema operativo Windows.
-- Puente de comunicación USB-UART CP210x.
-- Cable USB compatible con la tarjeta.
-- Arduino IDE para programar el microcontrolador.
-- Python para automatizar las pruebas.
-- Biblioteca `pySerial` para acceder al puerto serial.
+- Placa de desarrollo ESP32.
+- Computadora con Windows.
+- Cable USB para conectar el ESP32.
+- Interfaz USB-UART CP210x, integrada en la placa o utilizada como adaptador.
+- Arduino IDE.
+- Python.
+- Biblioteca `pySerial`.
+- Terminal de comandos de Windows o PowerShell.
 
-## 5. Arquitectura del sistema
+## 5. Desarrollo experimental
 
-El sistema está compuesto por una computadora que genera los mensajes, una interfaz USB-UART y el ESP32, que devuelve cada mensaje recibido.
+### 5.1 Configuración del ESP32
 
-El flujo de comunicación es el siguiente:
+Se programó el ESP32 para recibir mensajes por UART y devolverlos al emisor. Este comportamiento se conoce como comunicación de eco (*echo*).
 
-1. Python genera un mensaje con un identificador consecutivo.
-2. La computadora transmite el mensaje por el puerto serial.
-3. El ESP32 recibe los caracteres hasta detectar el salto de línea.
-4. El ESP32 devuelve el mensaje recibido.
-5. Python lee la respuesta y la compara con el mensaje original.
-6. El programa registra el resultado y calcula el tiempo de ida y vuelta.
-
-## 6. Metodología experimental
-
-### 6.1 Configuración de la comunicación
-
-Se conectó el ESP32 a la computadora mediante USB. La interfaz CP210x permitió que el sistema operativo identificara el dispositivo como un puerto serial.
-
-Se configuraron los parámetros de comunicación para utilizar ocho bits de datos, sin paridad y un bit de parada (8N1). La velocidad de transmisión se modificó durante las pruebas, manteniendo la misma configuración en ambos extremos.
-
-### 6.2 Implementación del programa en el ESP32
-
-Se programó el ESP32 para recibir los datos transmitidos desde la computadora y devolverlos como respuesta. La recepción se organizó por líneas, utilizando el carácter de nueva línea como delimitador de cada mensaje.
-
-El siguiente código representa una implementación básica de eco serial:
+El siguiente código configura la comunicación a 115200 baudios:
 
 ```cpp
 void setup() {
@@ -152,121 +173,167 @@ void setup() {
 }
 
 void loop() {
-  if (Serial.available()) {
+  if (Serial.available() > 0) {
     String mensaje = Serial.readStringUntil('\n');
     Serial.println(mensaje);
   }
 }
 ```
 
-La función `Serial.begin()` configura la velocidad inicial de comunicación. La función `Serial.available()` permite verificar si existen datos disponibles y `Serial.readStringUntil('\n')` lee el mensaje hasta encontrar un salto de línea o alcanzar el tiempo de espera configurado.
+La instrucción `Serial.begin(115200)` establece la velocidad de comunicación. La función `Serial.readStringUntil('\n')` lee los caracteres recibidos hasta encontrar un salto de línea o alcanzar el tiempo de espera configurado.
 
-Finalmente, `Serial.println()` transmite el mensaje recibido seguido de un salto de línea.
+Finalmente, `Serial.println(mensaje)` devuelve el mensaje recibido y agrega un salto de línea al final.
 
-**Nota:** la velocidad indicada en `Serial.begin()` debe coincidir con la configurada en el programa de Python para cada prueba.
+Para realizar las pruebas con otras velocidades, se debe modificar el valor de `Serial.begin()` y configurar la misma velocidad en el programa de Python.
 
-### 6.3 Prueba automatizada desde Python
+### 5.2 Comunicación desde Python
 
-Se utilizó Python junto con la biblioteca `pySerial` para automatizar el envío de mensajes.
+Se utilizó la biblioteca `pySerial` para abrir el puerto COM asociado al ESP32, transmitir mensajes y leer las respuestas.
 
-Cada mensaje contiene un identificador consecutivo, lo que permite distinguirlo de los demás y verificar si la respuesta corresponde al mensaje original.
+Cada mensaje se identifica mediante un número consecutivo, lo que permite verificar que el contenido recibido corresponde al enviado.
 
-El procedimiento de prueba consiste en:
+El formato de los mensajes es:
 
-1. Abrir el puerto serial con la velocidad seleccionada.
-2. Generar un mensaje con un identificador único.
-3. Registrar el instante de envío.
-4. Transmitir el mensaje.
-5. Esperar la respuesta del ESP32.
-6. Registrar el instante de recepción.
-7. Comparar el mensaje recibido con el enviado.
-8. Registrar el resultado y calcular el RTT.
-9. Repetir el proceso para el número de mensajes establecido.
+```text
+MSG:0000
+MSG:0001
+MSG:0002
+...
+```
 
-La medición del RTT se realiza con la diferencia entre el instante de recepción y el instante de envío:
+El programa compara cada respuesta con el mensaje original. Si ambos coinciden, el mensaje se clasifica como correcto. Si la respuesta no coincide o no se recibe dentro del tiempo de espera, se registra como error.
 
-\[
-RTT = t_{\text{recepción}} - t_{\text{envío}}
-\]
+### 5.3 Prueba automatizada de 1000 mensajes
 
-La medición depende de la configuración del programa, del tiempo de espera y del comportamiento del sistema operativo. Si una respuesta no llega antes del tiempo límite, el programa puede registrar un tiempo cercano al *timeout*, que no debe interpretarse como una medición normal de latencia.
+La prueba definitiva consiste en transmitir 1000 mensajes consecutivos. Para cada mensaje se registra:
 
-## 7. Resultados experimentales
+- Número de mensaje.
+- Contenido enviado.
+- Contenido recibido.
+- Estado de la comunicación.
+- Tiempo de ida y vuelta.
 
-### 7.1 Integridad de los mensajes
+El número de mensajes enviados se define como:
 
-Durante las pruebas diagnósticas se evaluó el comportamiento de la comunicación a diferentes velocidades de transmisión. Los resultados disponibles corresponden a ensayos de 100 mensajes por prueba.
+$$
+N_{\text{enviados}} = 1000
+$$
 
-| Velocidad (baudios) | Mensajes enviados | Correctos | Errores | Mensajes correctos (%) |
-|---:|---:|---:|---:|---:|
-| 115200 | 100 | 100 | 0 | 100 % |
-| 128000 | 100 | 0 | 100 | 0 % |
-| 153600 | 100 | 100 | 0 | 100 % |
-| 172800 | 100 | 0 | 100 | 0 % |
-| 230400, prueba A | 100 | 46 | 54 | 46 % |
-| 230400, prueba B | 100 | 68 | 32 | 68 % |
+La tasa de mensajes correctos y el porcentaje de errores se calculan a partir de los resultados obtenidos.
 
-**Importante:** estos resultados corresponden a pruebas diagnósticas de 100 mensajes. No deben confundirse con una validación final de 1000 mensajes.
+Los datos se guardan en un archivo CSV, lo que permite procesarlos posteriormente para obtener estadísticas y generar gráficas.
 
-Las pruebas a 115200 y 153600 baudios mostraron una recepción correcta de todos los mensajes durante los ensayos registrados. En cambio, a 230400 baudios se observaron errores y respuestas incompletas en ambas pruebas.
+**Importante:** para que la prueba sea válida, el Monitor Serial de Arduino IDE debe permanecer cerrado mientras Python utiliza el puerto COM. Además, el ESP32 y el programa de Python deben estar configurados con la misma velocidad de transmisión.
 
-Los resultados de 128000 y 172800 baudios también presentaron errores en las pruebas registradas. Sin embargo, antes de atribuirlos exclusivamente a la velocidad de transmisión, se debe comprobar la configuración de ambos extremos, el comportamiento del programa y el manejo de los tiempos de espera.
+### 5.4 Procedimiento experimental
 
-### 7.2 Interpretación de los resultados
+1. Conectar el ESP32 a la computadora mediante USB.
+2. Verificar que el controlador USB-UART esté instalado y que Windows reconozca el puerto COM.
+3. Cargar el programa de eco al ESP32.
+4. Cerrar el Monitor Serial de Arduino IDE.
+5. Ejecutar el programa de Python.
+6. Seleccionar el puerto COM correspondiente al ESP32.
+7. Ejecutar la prueba de 1000 mensajes a 115200 baudios.
+8. Guardar el archivo CSV generado.
+9. Repetir el procedimiento con otras velocidades, modificando la configuración tanto en el ESP32 como en Python.
+10. Comparar la integridad de los mensajes y las estadísticas de RTT para cada velocidad.
 
-Los resultados muestran que la comunicación no tuvo el mismo comportamiento para todas las configuraciones probadas.
+## 6. Resultados experimentales
 
-En las pruebas registradas a 115200 y 153600 baudios se obtuvo una tasa de mensajes correctos del 100 %. En las dos pruebas a 230400 baudios se presentaron respuestas incorrectas, incompletas o ausentes.
+### 6.1 Pruebas diagnósticas preliminares
 
-Una posible causa es una incompatibilidad entre la configuración del transmisor y la del receptor. También deben considerarse el manejo de los saltos de línea, los tiempos de espera, la lectura de los datos y los retardos introducidos por la interfaz USB-UART y el sistema operativo.
+Antes de la prueba completa de 1000 mensajes, se realizaron ensayos diagnósticos de 100 mensajes para observar el comportamiento de la comunicación a distintas velocidades.
 
-La tasa de mensajes correctos observada en las pruebas no permite concluir, por sí sola, que exista un límite físico de velocidad del ESP32 o del CP210x. Para establecer una velocidad máxima confiable es necesario repetir las pruebas bajo condiciones controladas y verificar que los parámetros de ambos extremos coincidan.
+Los resultados registrados fueron los siguientes:
 
-### 7.3 Medición del tiempo de respuesta
+| Velocidad (baudios) | Mensajes enviados | Mensajes correctos | Errores |
+|---:|---:|---:|---:|
+| 115200 | 100 | 100 | 0 |
+| 128000 | 100 | 0 | 100 |
+| 153600 | 100 | 100 | 0 |
+| 172800 | 100 | 0 | 100 |
+| 230400, ensayo A | 100 | 46 | 54 |
+| 230400, ensayo B | 100 | 68 | 32 |
 
-El RTT se obtiene a partir del tiempo transcurrido entre el envío de un mensaje desde Python y la recepción de su respuesta.
+Estos resultados corresponden a pruebas preliminares y no deben presentarse como los resultados de la prueba definitiva de 1000 mensajes.
 
-En las mediciones disponibles se observaron tiempos del orden de 1.4 a 2.2 ms en respuestas normales, mientras que algunas mediciones iniciales alcanzaron aproximadamente 51 ms. Estos valores deben interpretarse con cautela, ya que el tiempo de espera, la inicialización del puerto y el sistema operativo pueden afectar la medición.
+Los resultados de los ensayos a 128000 y 172800 baudios requieren una revisión de la configuración utilizada. No es posible atribuir automáticamente los errores a una limitación física del ESP32 sin verificar la coincidencia de las velocidades, la configuración serial y el comportamiento del programa receptor.
 
-Una respuesta que tarda cerca de 1000 ms puede corresponder al tiempo de espera configurado cuando el programa no recibe el salto de línea esperado. En ese caso, no representa necesariamente la latencia real de una respuesta correcta.
+En el caso de 230400 baudios, los dos ensayos presentaron resultados diferentes. Esto justifica repetir las pruebas bajo condiciones controladas antes de formular conclusiones sobre la confiabilidad de la comunicación.
 
-No se incluye una gráfica estadística completa de RTT porque para ello se requiere el conjunto íntegro de mediciones de cada prueba. Con los valores aislados disponibles no es posible calcular de forma confiable la distribución, la mediana, los percentiles ni la variabilidad del tiempo de respuesta.
+### 6.2 Resultados de la prueba definitiva
 
-## 8. Discusión
+Los resultados de la prueba de 1000 mensajes deben incorporarse en la siguiente tabla una vez que se ejecute el programa automatizado.
 
-Las pruebas permitieron comprobar el funcionamiento de la comunicación serial y observar cómo cambia la integridad de los mensajes al modificar la velocidad de transmisión.
+| Velocidad (baudios) | Enviados | Correctos | Errores | Correctos (%) | RTT promedio (ms) |
+|---:|---:|---:|---:|---:|---:|
+| 115200 | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente |
+| 153600 | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente |
+| 230400 | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente |
 
-La comparación entre velocidades mostró que algunas configuraciones presentaron una recepción correcta durante los ensayos registrados, mientras que otras tuvieron errores. No obstante, estos resultados deben interpretarse considerando que la comunicación depende tanto de los parámetros físicos y de configuración como de la implementación del programa receptor.
+Los valores pendientes deben sustituirse por los datos obtenidos experimentalmente. No deben estimarse a partir de las pruebas diagnósticas, puesto que los resultados pueden variar entre ejecuciones.
 
-La utilización de mensajes identificados mediante números consecutivos facilitó la detección de respuestas incorrectas. Asimismo, la medición de RTT permitió observar el tiempo de respuesta del sistema completo, aunque no separa los retardos correspondientes a cada componente.
+### 6.3 Análisis de latencia
 
-Para obtener resultados experimentales más sólidos, se recomienda repetir cada configuración varias veces, utilizar el mismo número de mensajes en todas las pruebas y guardar los tiempos de respuesta individuales en un archivo CSV. También es importante distinguir entre respuestas correctas, respuestas incompletas, mensajes incorrectos y tiempos de espera agotados.
+El RTT promedio permite comparar el tiempo de respuesta de la comunicación a distintas velocidades de transmisión.
 
-Finalmente, la velocidad máxima confiable debe definirse a partir de pruebas repetibles y de una tasa de errores aceptable, no solamente a partir de la velocidad nominal configurada.
+Para calcularlo se consideran únicamente las respuestas correctas que cuentan con una medición válida del tiempo de ida y vuelta.
 
-## 9. Conclusiones
+Además del promedio, resulta útil registrar la mediana, el mínimo, el máximo, la desviación estándar y el percentil 95 del RTT. Estas métricas permiten evaluar tanto el comportamiento típico como la variabilidad de los tiempos de respuesta.
 
-- Se implementó una comunicación serial UART entre un ESP32 y una computadora mediante una interfaz USB-UART CP210x.
-- Se utilizó un mecanismo de eco para comprobar la transmisión y recepción de mensajes.
-- Las pruebas diagnósticas registraron una recepción correcta del 100 % a 115200 y 153600 baudios.
-- Las dos pruebas a 230400 baudios presentaron errores de comunicación, por lo que se requiere analizar la configuración y el manejo de los mensajes antes de establecer una conclusión definitiva.
-- El RTT medido incluye el envío, la recepción, el procesamiento y los retardos asociados a la interfaz USB y al sistema operativo.
-- Los resultados disponibles son preliminares y no permiten establecer de forma definitiva la velocidad máxima confiable del sistema.
+Los valores definitivos de latencia se incorporarán después de completar los ensayos de 1000 mensajes.
 
-## 10. Trabajo futuro
+### 6.4 Gráficas
 
-Para ampliar la evaluación se propone:
+Con los datos del archivo CSV se recomienda generar las siguientes gráficas:
 
-1. Realizar pruebas de 1000 mensajes por configuración.
-2. Verificar que el ESP32 y Python utilicen exactamente la misma velocidad de transmisión.
-3. Registrar por separado los mensajes correctos, incorrectos y las respuestas que excedan el tiempo de espera.
-4. Guardar las mediciones de RTT en archivos CSV.
-5. Calcular el promedio, la mediana, la desviación estándar y los percentiles del RTT.
-6. Generar gráficas que permitan comparar la tasa de errores y los tiempos de respuesta entre configuraciones.
-7. Repetir cada ensayo para evaluar la reproducibilidad de los resultados.
+1. **Porcentaje de mensajes correctos por velocidad de transmisión.** Permite comparar la integridad de la comunicación.
+2. **RTT promedio por velocidad de transmisión.** Permite comparar los tiempos medios de respuesta.
+3. **RTT por número de mensaje.** Permite observar la variación temporal de las mediciones.
+4. **Distribución de RTT.** Un histograma permite identificar la dispersión y posibles valores atípicos.
 
-## 11. Referencias
+Las gráficas deben elaborarse con los resultados reales de cada prueba. No se presentan gráficas definitivas mientras no se cuente con los datos completos de los ensayos.
 
-1. Espressif Systems. *ESP-IDF Programming Guide: UART*. Documentación oficial del fabricante: https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/uart.html
+## 7. Discusión
 
-2. pySerial. *pySerial Documentation*. Documentación de la biblioteca utilizada para la comunicación serial desde Python: https://pyserial.readthedocs.io/en/latest/
+La evaluación de una comunicación UART requiere distinguir entre la velocidad nominal configurada y el comportamiento real de la transmisión.
+
+Una velocidad nominal mayor no garantiza por sí sola una comunicación más rápida o confiable. Los resultados dependen de la configuración de ambos dispositivos, la implementación del programa receptor, los retardos de la interfaz USB-UART y el sistema operativo.
+
+El programa de eco permite evaluar la integridad de los mensajes y obtener una medición de RTT. Sin embargo, esta medición incluye componentes de tiempo que no pertenecen exclusivamente al ESP32.
+
+También debe considerarse que un mensaje sin respuesta puede indicar un tiempo de espera agotado, un problema de configuración, una pérdida de datos o un fallo en el procesamiento. Por ello, los errores observados deben interpretarse junto con la configuración experimental y los registros de cada ensayo.
+
+Finalmente, las pruebas de 100 mensajes sirven como diagnóstico inicial, mientras que los ensayos de 1000 mensajes proporcionan una muestra más amplia para analizar la consistencia de la comunicación.
+
+## 8. Conclusiones
+
+La práctica permitió implementar una comunicación UART entre un ESP32 y una computadora, utilizando un programa de eco en el microcontrolador y Python para automatizar el envío y la recepción de mensajes.
+
+La comparación entre los mensajes enviados y recibidos proporciona una medida de la integridad de la comunicación. Asimismo, el registro del RTT permite evaluar el tiempo de respuesta del sistema completo.
+
+Las pruebas diagnósticas preliminares mostraron diferencias en el comportamiento de la comunicación a distintas velocidades. Sin embargo, estos resultados deben verificarse mediante ensayos controlados y pruebas completas de 1000 mensajes antes de establecer conclusiones definitivas sobre el rendimiento.
+
+La automatización de las mediciones facilita la repetición de los experimentos, la recopilación de datos y la elaboración de gráficas para comparar las condiciones de operación.
+
+## 9. Trabajo futuro
+
+Como continuación de la práctica, se propone:
+
+- Completar las pruebas de 1000 mensajes para cada velocidad seleccionada.
+- Repetir cada ensayo para comprobar la reproducibilidad de los resultados.
+- Comparar el porcentaje de errores y las métricas de RTT.
+- Generar gráficas a partir de los archivos CSV.
+- Verificar la configuración serial antes de atribuir los errores a una limitación del hardware.
+- Investigar el efecto del tamaño de los mensajes y del tiempo de espera sobre las mediciones.
+
+## 10. Referencias
+
+1. Espressif Systems. *ESP-IDF Programming Guide: UART*. Documentación oficial de ESP-IDF.
+   https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/uart.html
+
+2. pySerial. *pySerial Documentation*.
+   https://pyserial.readthedocs.io/en/latest/
+
+3. Arduino. *Serial*. Documentación de referencia de Arduino.
+   https://docs.arduino.cc/language-reference/en/functions/communication/serial/
