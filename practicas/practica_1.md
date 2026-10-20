@@ -4,7 +4,7 @@ title: Práctica 2
 nav_order: 3
 ---
 
-# Práctica 2: Medición y Comparación de Latencia en Redes Inalámbricas (Wi-Fi vs. Bluetooth)
+# Práctica 1: Medición y Comparación de Latencia en Redes Inalámbricas (Wi-Fi vs. Bluetooth)
 
 **Autores:** Diego Márquez Esqueda, Andrick Millán Bernal, Marco Alfonso Rodríguez Calixto
 
