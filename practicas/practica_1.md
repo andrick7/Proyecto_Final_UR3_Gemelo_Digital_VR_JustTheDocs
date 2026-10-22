@@ -1,7 +1,8 @@
 ---
+title: Práctica 1
 layout: default
-title: Práctica 2
-nav_order: 3
+parent: Prácticas
+nav_order: 1
 ---
 
 # Práctica 1: Medición y Comparación de Latencia en Redes Inalámbricas (Wi-Fi vs. Bluetooth)

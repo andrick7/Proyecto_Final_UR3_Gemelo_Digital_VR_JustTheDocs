@@ -1,4 +1,3 @@
-
 ---
 title: Práctica 3
 layout: default
